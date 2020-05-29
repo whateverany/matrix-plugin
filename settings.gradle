@@ -1,2 +1,3 @@
 rootProject.name = 'polo'
-
+include 'polo-common'
+include 'polo-bukkit'

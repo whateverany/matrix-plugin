@@ -1,6 +1,8 @@
-package dev.dhdf.polo.mc;
+package dev.dhdf.polo.bukkit;
 
 import dev.dhdf.polo.webclient.WebClient;
+import dev.dhdf.polo.webclient.types.PoloPlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -21,7 +23,8 @@ public class MCListener implements Listener {
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent ev) {
         String body = ev.getMessage();
+        Player player = ev.getPlayer();
 
-        this.client.postChat(ev.getPlayer(), body);
+        this.client.postChat(new PoloPlayer(player.getName(), player.getUniqueId()), body);
     }
 }

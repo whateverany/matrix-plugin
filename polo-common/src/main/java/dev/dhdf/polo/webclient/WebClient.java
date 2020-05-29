@@ -1,21 +1,21 @@
 package dev.dhdf.polo.webclient;
 
+import dev.dhdf.polo.PoloPlugin;
 import dev.dhdf.polo.webclient.types.MCMessage;
 import dev.dhdf.polo.webclient.types.MxMessage;
 import dev.dhdf.polo.webclient.types.PoloPlayer;
-import org.bukkit.Server;
-import org.bukkit.entity.Player;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.logging.Logger;
 
 
 /**
@@ -28,24 +28,25 @@ public class WebClient {
     private final String address;
     private final int port;
     private final String token;
-    private final Server server;
 
-    public WebClient(Server server, Config config) {
+    private final Logger logger = LoggerFactory.getLogger(WebClient.class);
+    private final PoloPlugin plugin;
+
+    public WebClient(PoloPlugin plugin, Config config) {
         this.address = config.address;
         this.port = config.port;
         this.token = config.token;
-        this.server = server;
+        this.plugin = plugin;
     }
 
     /**
      * Send new chat messages to Marco
      *
-     * @param mcPlayer Player object representing a Minecraft player, it
+     * @param player Player object representing a Minecraft player, it
      *                 must be parsed before sent to Marco
      * @param context  The body of the message
      */
-    public void postChat(Player mcPlayer, String context) {
-        PoloPlayer player = new PoloPlayer(mcPlayer);
+    public void postChat(PoloPlayer player, String context) {
         MCMessage message = new MCMessage(player, context);
         String body = message.toString();
 
@@ -76,7 +77,7 @@ public class WebClient {
     }
 
     public void onRoomMessage(MxMessage message) {
-        this.server.broadcastMessage(message.body);
+        this.plugin.broadcastMessage(message.body);
     }
 
     /**
@@ -101,7 +102,6 @@ public class WebClient {
     }
 
     public JSONObject doRequest(String method, String endpoint, String body) {
-        Logger logger = server.getLogger();
         try {
             URL url = new URL(
                     "http://" + address + ":" + port + endpoint
@@ -133,9 +133,9 @@ public class WebClient {
                     JSONObject parsed = new JSONObject(parsing);
 
                     if (resCode != 200) {
-                        logger.warning("An error has occurred");
-                        logger.warning(parsed.getString("error"));
-                        logger.warning(parsed.getString("message"));
+                        logger.warn("An error has occurred");
+                        logger.warn(parsed.getString("error"));
+                        logger.warn(parsed.getString("message"));
                     }
 
                     return parsed;
@@ -143,7 +143,7 @@ public class WebClient {
                     return null;
                 }
             } else {
-                logger.severe("An invalid endpoint was called for.");
+                logger.error("An invalid endpoint was called for.");
                 return null;
             }
         } catch (IOException | JSONException | NullPointerException e) {
