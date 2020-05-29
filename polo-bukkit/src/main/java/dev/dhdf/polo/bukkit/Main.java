@@ -1,6 +1,6 @@
-package dev.dhdf.polo;
+package dev.dhdf.polo.bukkit;
 
-import dev.dhdf.polo.mc.MCListener;
+import dev.dhdf.polo.PoloPlugin;
 import dev.dhdf.polo.util.Sync;
 import dev.dhdf.polo.webclient.Config;
 import dev.dhdf.polo.webclient.WebClient;
@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 /**
  * This starts the plugin
  */
-public class Main extends JavaPlugin {
+public class Main extends JavaPlugin implements PoloPlugin {
     @Override
     public void onEnable() {
         // First read from the config
@@ -31,13 +31,21 @@ public class Main extends JavaPlugin {
             logger.severe("Please modify the configuration");
         }
 
-        Config config = new Config(pluginConfig);
+        Config config = new Config(
+                pluginConfig.getString("address"),
+                pluginConfig.getInt("port"),
+                pluginConfig.getString("token")
+        );
 
         // Start up the web client
         WebClient webClient = new WebClient(
-                this.getServer(),
+                this,
                 config
         );
+
+        // Make the WebClient log through our PluginLogger
+        Logger.getLogger(WebClient.class.getName()).setParent(getLogger());
+
         // Start up the Minecraft event listener
         MCListener mcListener = new MCListener(webClient);
 
@@ -94,5 +102,10 @@ public class Main extends JavaPlugin {
     private FileConfiguration genConfig() {
         this.saveDefaultConfig();
         return this.getConfig();
+    }
+
+    @Override
+    public void broadcastMessage(String message) {
+        this.getServer().broadcastMessage(message);
     }
 }

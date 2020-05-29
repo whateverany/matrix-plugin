@@ -1,7 +1,5 @@
 package dev.dhdf.polo.webclient;
 
-import org.bukkit.configuration.file.FileConfiguration;
-
 /**
  * This reads from the config.yaml and inserts them into their
  * corresponding properties
@@ -11,9 +9,9 @@ public class Config {
     public final int port;
     public final String token;
 
-    public Config(FileConfiguration config) {
-        address = config.getString("address");
-        token = config.getString("token");
-        port = config.getInt("port");
+    public Config(String address, int port, String token) {
+        this.address = address;
+        this.port = port;
+        this.token = token;
     }
 }
