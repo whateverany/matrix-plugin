@@ -1,5 +1,5 @@
 name: polo
 version: '1.0.0'
 author: 'Dylan Hackworth'
-main: 'dev.dhdf.polo.Main'
+main: 'dev.dhdf.polo.bukkit.Main'
 api-version: '1.15'
