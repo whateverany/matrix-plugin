@@ -4,11 +4,11 @@ import org.json.JSONStringer;
 
 public class MCMessage {
     public final PoloPlayer player;
-    public final String body;
+    public final String message;
 
     public MCMessage(PoloPlayer player, String message) {
         this.player = player;
-        this.body = message;
+        this.message = message;
     }
 
     public String toString() {
@@ -21,8 +21,8 @@ public class MCMessage {
                 .key("uuid")
                 .value(this.player.uuid)
                 .endObject()
-                .key("body")
-                .value(this.body)
+                .key("message")
+                .value(this.message)
                 .endObject()
                 .toString();
     }
