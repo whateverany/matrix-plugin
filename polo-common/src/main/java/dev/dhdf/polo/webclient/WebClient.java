@@ -65,6 +65,8 @@ public class WebClient {
                 "/chat",
                 null
         );
+        if (chatResponse == null)
+            return;
         JSONArray messages = chatResponse.getJSONArray("chat");
 
         // Send all the new messages to the minecraft chat
