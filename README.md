@@ -5,7 +5,7 @@ Built for: [Matrix Minecraft Appservice (0.9.4)](https://github.com/dhghf/matrix
  1. Run `gradle build`
 
 ### Setup Bukkit / Spigot
- 1. Copy polo-bukkit/polo-bukkit-1.0.0-all.jar
+ 1. Copy `polo-bukkit/build/libs/polo-bukkit-1.0.0-all.jar`
  2. Send it to your Minecraft server plugins directory
 
 While in your server's directory:
