@@ -1,9 +1,8 @@
 package dev.dhdf.polo.webclient;
 
 import dev.dhdf.polo.PoloPlugin;
-import dev.dhdf.polo.webclient.types.MCMessage;
-import dev.dhdf.polo.webclient.types.MxMessage;
-import dev.dhdf.polo.webclient.types.PoloPlayer;
+import dev.dhdf.polo.types.MCMessage;
+import dev.dhdf.polo.types.PoloPlayer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,14 +69,13 @@ public class WebClient {
 
         // Send all the new messages to the minecraft chat
         for (int i = 0; i < messages.length(); ++i) {
-            JSONObject message = messages.getJSONObject(i);
-            MxMessage parsedMessage = new MxMessage(message);
-            onRoomMessage(parsedMessage);
+            String message = messages.getString(i);
+            onRoomMessage(message);
         }
     }
 
-    public void onRoomMessage(MxMessage message) {
-        this.plugin.broadcastMessage(message.body);
+    public void onRoomMessage(String message) {
+        this.plugin.broadcastMessage(message);
     }
 
     /**
