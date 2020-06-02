@@ -1,4 +1,4 @@
-package dev.dhdf.polo.webclient.types;
+package dev.dhdf.polo.types;
 
 import org.json.JSONStringer;
 
