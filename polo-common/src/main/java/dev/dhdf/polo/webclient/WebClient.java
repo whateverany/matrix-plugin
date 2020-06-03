@@ -128,7 +128,7 @@ public class WebClient {
                 if (stream == null)
                     stream = connection.getInputStream();
 
-                if (stream.toString().length() > 0) {
+                if (stream.toString().startsWith("{")) {
                     JSONTokener parsing = new JSONTokener(stream);
                     JSONObject parsed = new JSONObject(parsing);
 
