@@ -91,7 +91,7 @@ public class Main extends JavaPlugin implements PoloPlugin {
         else if (token == null)
             return false;
         else
-            return (port == 0);
+            return (port != 0);
     }
 
     /**
