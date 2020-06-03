@@ -52,7 +52,8 @@ public class WebClient {
         this.doRequest(
                 "POST",
                 "/chat",
-                body
+                body,
+                false
         );
     }
 
@@ -63,7 +64,8 @@ public class WebClient {
         JSONObject chatResponse = this.doRequest(
                 "GET",
                 "/chat",
-                null
+                null,
+                true
         );
         if (chatResponse == null)
             return;
@@ -91,7 +93,8 @@ public class WebClient {
             JSONObject check = this.doRequest(
                     "GET",
                     "/vibeCheck",
-                    null
+                    null,
+                    true
             );
 
             return check.getString("status").equals("OK");
@@ -101,7 +104,7 @@ public class WebClient {
         }
     }
 
-    public JSONObject doRequest(String method, String endpoint, String body) {
+    public JSONObject doRequest(String method, String endpoint, String body, Boolean expectJSON) {
         try {
             URL url = new URL(
                     "http://" + address + ":" + port + endpoint
@@ -121,21 +124,25 @@ public class WebClient {
                 writer.close();
             }
 
-            InputStream stream = connection.getErrorStream();
             int resCode = connection.getResponseCode();
 
             if (resCode != 404) {
-                if (stream == null)
+                InputStream stream = null;
+                if (resCode != 200) {
+                    logger.warn("An error has occurred: " + resCode);
+                    stream = connection.getErrorStream();
+                } else if (expectJSON) {
                     stream = connection.getInputStream();
+                }
 
-                if (stream.toString().startsWith("{")) {
+                if (stream != null) {
                     JSONTokener parsing = new JSONTokener(stream);
                     JSONObject parsed = new JSONObject(parsing);
 
                     if (resCode != 200) {
-                        logger.warn("An error has occurred");
                         logger.warn(parsed.getString("error"));
                         logger.warn(parsed.getString("message"));
+                        return null;
                     }
 
                     return parsed;
