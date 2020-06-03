@@ -9,7 +9,7 @@ import java.util.TimerTask;
  * This class gets the chat from Marco in a set interval
  * (see Main class)
  */
-public class Sync extends TimerTask {
+public class Sync implements Runnable {
     private final WebClient client;
 
     public Sync(WebClient client) {
