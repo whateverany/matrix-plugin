@@ -18,6 +18,9 @@ import java.util.logging.Logger;
 public class Main extends JavaPlugin implements PoloPlugin {
     @Override
     public void onEnable() {
+        // Save the default config if it isn't already there
+        this.saveDefaultConfig();
+
         // First read from the config
         FileConfiguration pluginConfig = this.getConfig();
         Logger logger = getLogger();
@@ -25,11 +28,8 @@ public class Main extends JavaPlugin implements PoloPlugin {
 
         logger.info("Started Polo plugin");
 
-        if (!isValid) {
-            pluginConfig = this.genConfig();
-            logger.warning("Generated default config");
-            logger.severe("Please modify the configuration");
-        }
+        if (!isValid)
+            logger.severe("Incomplete config.yml, please modify");
 
         Config config = new Config(
                 pluginConfig.getString("address"),
@@ -86,22 +86,12 @@ public class Main extends JavaPlugin implements PoloPlugin {
         String token = config.getString("token");
         int port = config.getInt("port");
 
-        if (address == null)
+        if (address == null || address.isEmpty())
             return false;
-        else if (token == null)
+        else if (token == null || token.isEmpty())
             return false;
         else
             return (port != 0);
-    }
-
-    /**
-     * This gets the default config.yaml and returns it
-     *
-     * @return FileConfiguration
-     */
-    private FileConfiguration genConfig() {
-        this.saveDefaultConfig();
-        return this.getConfig();
     }
 
     @Override
