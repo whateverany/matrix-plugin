@@ -49,11 +49,14 @@ public class WebClient {
         MCMessage message = new MCMessage(player, context);
         String body = message.toString();
 
-        this.doRequest(
-                "POST",
-                "/chat",
-                body,
-                false
+        // Run communication outside the server thread
+        plugin.executeAsync(() ->
+                this.doRequest(
+                        "POST",
+                        "/chat",
+                        body,
+                        false
+                )
         );
     }
 
