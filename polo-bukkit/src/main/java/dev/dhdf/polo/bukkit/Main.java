@@ -93,4 +93,9 @@ public class Main extends JavaPlugin implements PoloPlugin {
     public void broadcastMessage(String message) {
         this.getServer().broadcastMessage(message);
     }
+
+    @Override
+    public void executeAsync(Runnable task) {
+        this.getServer().getScheduler().runTaskAsynchronously(this, task);
+    }
 }
