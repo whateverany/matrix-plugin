@@ -59,7 +59,7 @@ public class Main extends JavaPlugin implements PoloPlugin {
         if (vibeCheck) {
             logger.finer("Started bridge");
             Sync sync = new Sync(webClient);
-            getServer().getScheduler().runTaskTimerAsynchronously(this, sync, 0, 5000);
+            getServer().getScheduler().runTaskTimerAsynchronously(this, sync, 0, 5*20);
         } else {
             logger.severe("Couldn't properly connect to marco is the address and port set properly?");
         }
