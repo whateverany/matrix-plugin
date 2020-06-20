@@ -1,3 +1,14 @@
 address: "127.0.0.1"
 port: 3051
 token: ""
+
+# Whether to relay Minecraft player joins, quits & kicks to Matrix.
+# If this is set to true, fake Matrix users will:
+#  - join the Matrix room when the player connects to the Minecraft server.
+#  - leave the Matrix room when the player quits from the Minecraft server.
+#  - get kicked from the Matrix room by the _mc_bot user when the player is
+#    kicked from the Minecraft server (make sure that the _mc_bot has
+#    sufficient privileges to kick users).
+# If this is set to false, fake Matrix users will join the room only to relay
+# chat messages from players, and won't leave by themselves.
+relay-minecraft-membership: true

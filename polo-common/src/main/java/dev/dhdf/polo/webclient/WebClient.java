@@ -2,6 +2,9 @@ package dev.dhdf.polo.webclient;
 
 import dev.dhdf.polo.PoloPlugin;
 import dev.dhdf.polo.types.MCMessage;
+import dev.dhdf.polo.types.MCJoin;
+import dev.dhdf.polo.types.MCQuit;
+import dev.dhdf.polo.types.MCKick;
 import dev.dhdf.polo.types.PoloPlayer;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +34,80 @@ public class WebClient {
     public WebClient(PoloPlugin plugin, Config config) {
         this.config = config;
         this.plugin = plugin;
+    }
+
+    /**
+     * Send player join event to Marco
+     *
+     * @param player Player object representing a Minecraft player who has
+     *                  joined the server, it must be parsed before sent to
+     *                  Marco
+     */
+    public void postJoin(PoloPlayer player) {
+        if (!config.relayMinecraftMembership)
+            return;
+
+        MCJoin join = new MCJoin(player);
+        String body = join.toString();
+
+        // Run communication outside the server thread
+        plugin.executeAsync(() ->
+                this.doRequest(
+                        "POST",
+                        "/player/join",
+                        body,
+                        false
+                )
+        );
+    }
+
+    /**
+     * Send player quit event to Marco
+     *
+     * @param player Player object representing a Minecraft player who has quit
+     *                  the server, it must be parsed before sent to Marco
+     */
+    public void postQuit(PoloPlayer player) {
+        if (!config.relayMinecraftMembership)
+            return;
+
+        MCQuit quit = new MCQuit(player);
+        String body = quit.toString();
+
+        // Run communication outside the server thread
+        plugin.executeAsync(() ->
+                this.doRequest(
+                        "POST",
+                        "/player/quit",
+                        body,
+                        false
+                )
+        );
+    }
+
+    /**
+     * Send player kick event to Marco
+     *
+     * @param player Player object representing a Minecraft player who has been
+     *                  kicked, it must be parsed before sent to Marco
+     * @param reason The reason for the player being kicked
+     */
+    public void postKick(PoloPlayer player, String reason) {
+        if (!config.relayMinecraftMembership)
+            return;
+
+        MCKick kick = new MCKick(player, reason);
+        String body = kick.toString();
+
+        // Run communication outside the server thread
+        plugin.executeAsync(() ->
+                this.doRequest(
+                        "POST",
+                        "/player/kick",
+                        body,
+                        false
+                )
+        );
     }
 
     /**
