@@ -27,6 +27,7 @@ public class WebClient {
     private final String address;
     private final int port;
     private final String token;
+    private final boolean relay_mc_membership;
 
     private final Logger logger = LoggerFactory.getLogger(WebClient.class);
     private final PoloPlugin plugin;
@@ -35,7 +36,62 @@ public class WebClient {
         this.address = config.address;
         this.port = config.port;
         this.token = config.token;
+        this.relay_mc_membership = config.relay_mc_membership;
         this.plugin = plugin;
+    }
+
+    public void postJoin(PoloPlayer player, String context) {
+        if (!relay_mc_membership)
+            return;
+
+        MCMessage message = new MCMessage(player, context);
+        String body = message.toString();
+
+        // Run communication outside the server thread
+        plugin.executeAsync(() ->
+                this.doRequest(
+                        "POST",
+                        "/chat/join",
+                        body,
+                        false
+                )
+        );
+    }
+
+    public void postQuit(PoloPlayer player, String context) {
+        if (!relay_mc_membership)
+            return;
+
+        MCMessage message = new MCMessage(player, context);
+        String body = message.toString();
+
+        // Run communication outside the server thread
+        plugin.executeAsync(() ->
+                this.doRequest(
+                        "POST",
+                        "/chat/quit",
+                        body,
+                        false
+                )
+        );
+    }
+
+    public void postKick(PoloPlayer player, String reason) {
+        if (!relay_mc_membership)
+            return;
+
+        MCMessage message = new MCMessage(player, reason);
+        String body = message.toString();
+
+        // Run communication outside the server thread
+        plugin.executeAsync(() ->
+                this.doRequest(
+                        "POST",
+                        "/chat/kick",
+                        body,
+                        false
+                )
+        );
     }
 
     /**
