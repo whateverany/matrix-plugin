@@ -38,6 +38,35 @@ public class WebClient {
         this.plugin = plugin;
     }
 
+    public void postJoin(PoloPlayer player, String context) {
+        MCMessage message = new MCMessage(player, context);
+        String body = message.toString();
+
+        // Run communication outside the server thread
+        plugin.executeAsync(() ->
+                this.doRequest(
+                        "POST",
+                        "/chat/join",
+                        body,
+                        false
+                )
+        );
+    }
+    public void postQuit(PoloPlayer player, String context) {
+        MCMessage message = new MCMessage(player, context);
+        String body = message.toString();
+
+        // Run communication outside the server thread
+        plugin.executeAsync(() ->
+                this.doRequest(
+                        "POST",
+                        "/chat/quit",
+                        body,
+                        false
+                )
+        );
+    }
+
     /**
      * Send new chat messages to Marco
      *

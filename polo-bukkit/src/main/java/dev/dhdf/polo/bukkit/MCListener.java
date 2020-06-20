@@ -5,6 +5,8 @@ import dev.dhdf.polo.webclient.WebClient;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 
@@ -18,6 +20,22 @@ public class MCListener implements Listener {
 
     public MCListener(WebClient client) {
         this.client = client;
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent ev) {
+        Player player = ev.getPlayer();
+        String joinMessage = ev.getJoinMessage();
+
+        this.client.postJoin(new PoloPlayer(player.getName(), player.getUniqueId()), joinMessage);
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent ev) {
+        Player player = ev.getPlayer();
+        String quitMessage = ev.getQuitMessage();
+
+        this.client.postQuit(new PoloPlayer(player.getName(), player.getUniqueId()), quitMessage);
     }
 
     @EventHandler
