@@ -34,7 +34,8 @@ public class Main extends JavaPlugin implements PoloPlugin {
         Config config = new Config(
                 pluginConfig.getString("address"),
                 pluginConfig.getInt("port"),
-                pluginConfig.getString("token")
+                pluginConfig.getString("token"),
+                pluginConfig.getBoolean("relay-mc-membership")
         );
 
         // Start up the web client
