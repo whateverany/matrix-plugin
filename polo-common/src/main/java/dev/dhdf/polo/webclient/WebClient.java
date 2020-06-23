@@ -119,7 +119,7 @@ public class WebClient {
     /**
      * Get new messages from Marco and the Matrix room
      */
-    public void getChat() {
+    public boolean getChat() {
         JSONObject chatResponse = this.doRequest(
                 "GET",
                 "/chat",
@@ -127,7 +127,7 @@ public class WebClient {
                 true
         );
         if (chatResponse == null)
-            return;
+            return false;
         JSONArray messages = chatResponse.getJSONArray("chat");
 
         // Send all the new messages to the minecraft chat
@@ -135,6 +135,56 @@ public class WebClient {
             String message = messages.getString(i);
             onRoomMessage(message);
         }
+
+        return true;
+    }
+
+    /**
+     * Get new events from Marco and the Matrix room
+     */
+    public boolean getEvents() {
+        JSONObject eventsResponse = this.doRequest(
+                "GET",
+                "/chat/events",
+                null,
+                true
+        );
+        if (eventsResponse == null)
+            return false;
+        JSONArray events = eventsResponse.getJSONArray("events");
+
+        for (int i = 0; i < events.length(); ++i) {
+            JSONObject event = events.getJSONObject(i);
+
+            JSONObject sender = event.getJSONObject("sender");
+            String senderDisplayName = sender.getString("displayName");
+            String type = event.getString("type");
+            switch (type) {
+                case "dev.dhdf.mx.message.text":
+                case "dev.dhdf.mx.message.emote":
+                case "dev.dhdf.mx.message.announce":
+                    String body = event.getString("body");
+                    switch (type) {
+                        case "dev.dhdf.mx.message.text":
+                            body = "<" + senderDisplayName + "> " + body;
+                            break;
+                        case "dev.dhdf.mx.message.emote":
+                            body = " * <" + senderDisplayName + "> " + body;
+                            break;
+                        case "dev.dhdf.mx.message.announce":
+                            body = "[Server]" + body;
+                            break;
+                    }
+                    onRoomMessage(body);
+                    break;
+
+                default:
+                    logger.warn("Unknown matrix event type '"+type+"' ignored");
+                    break;
+            }
+        }
+
+        return true;
     }
 
     public void onRoomMessage(String message) {
