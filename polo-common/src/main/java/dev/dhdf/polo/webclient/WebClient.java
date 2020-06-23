@@ -135,7 +135,7 @@ public class WebClient {
     /**
      * Get new messages from Marco and the Matrix room
      */
-    public void getChat() {
+    public boolean getChat() {
         JSONObject chatResponse = this.doRequest(
                 "GET",
                 "/chat",
@@ -143,13 +143,71 @@ public class WebClient {
                 true
         );
         if (chatResponse == null)
-            return;
+            return false;
         JSONArray messages = chatResponse.getJSONArray("chat");
 
         // Send all the new messages to the minecraft chat
         for (int i = 0; i < messages.length(); ++i) {
             String message = messages.getString(i);
             onRoomMessage(message);
+        }
+
+        return true;
+    }
+
+    /**
+     * Get new events from Marco and the Matrix room
+     */
+    public boolean getEvents() {
+        JSONObject eventsResponse = this.doRequest(
+                "GET",
+                "/events",
+                null,
+                true
+        );
+        if (eventsResponse == null)
+            return false;
+        JSONArray events = eventsResponse.getJSONArray("events");
+
+        for (int i = 0; i < events.length(); ++i) {
+            JSONObject event = events.getJSONObject(i);
+            String type = event.getString("type");
+            try {
+                handleEvent(type, event);
+            } catch (Exception e) {
+                logger.warn("Exception while handling matrix event type '{}'", type);
+                e.printStackTrace();
+            }
+        }
+
+        return true;
+    }
+
+    private void handleEvent(String type, JSONObject event) {
+        JSONObject sender = event.getJSONObject("sender");
+        String senderDisplayName = sender.getString("displayName");
+        switch (type) {
+            case "message.text":
+            case "message.emote":
+            case "message.announce":
+                String body = event.getString("body");
+                switch (type) {
+                    case "message.text":
+                        body = "<" + senderDisplayName + "> " + body;
+                        break;
+                    case "message.emote":
+                        body = " * <" + senderDisplayName + "> " + body;
+                        break;
+                    case "message.announce":
+                        body = "[Server]" + body;
+                        break;
+                }
+                onRoomMessage(body);
+                break;
+
+            default:
+                logger.warn("Unknown matrix event type '{}' ignored", type);
+                break;
         }
     }
 
