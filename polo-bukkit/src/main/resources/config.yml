@@ -12,3 +12,14 @@ token: ""
 # If this is set to false, fake Matrix users will join the room only to relay
 # chat messages from players, and won't leave by themselves.
 relay-mc-membership: true
+
+# Whether to relay Matrix kicks to Minecraft.
+# If this is set to true, the plugin will respond to fake Matrix users being
+# kicked by kicking the corresponding player from the minecraft server.
+relay-mx-kicks: true
+
+# Whether to relay Matrix bans & unbans to Minecraft.
+# If this is set to true, the plugin will respond to fake Matrix users being
+# banned or unbanned by banning or unbanning the corresponding player from the
+# Minecraft server.
+relay-mx-bans: true
