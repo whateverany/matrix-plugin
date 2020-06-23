@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.UUID;
 
 
 /**
@@ -186,6 +187,7 @@ public class WebClient {
     private void handleEvent(String type, JSONObject event) {
         JSONObject sender = event.getJSONObject("sender");
         String senderDisplayName = sender.getString("displayName");
+        String reason = null;
         switch (type) {
             case "message.text":
             case "message.emote":
@@ -205,6 +207,29 @@ public class WebClient {
                 onRoomMessage(body);
                 break;
 
+            case "player.kick":
+            case "player.ban":
+                // reason is optional
+                if (event.has("reason"))
+                    reason = event.getString("reason");
+                // Fall-through
+            case "player.unban":
+                JSONObject player = event.getJSONObject("player");
+                String uuidStr = player.getString("uuid");
+                UUID uuid = uuidFromString(uuidStr);
+                switch (type) {
+                    case "player.kick":
+                        onPlayerKick(uuid, reason, senderDisplayName);
+                        break;
+                    case "player.ban":
+                        onPlayerBan(uuid, reason, senderDisplayName);
+                        break;
+                    case "player.unban":
+                        onPlayerUnban(uuid, senderDisplayName);
+                        break;
+                }
+                break;
+
             default:
                 logger.warn("Unknown matrix event type '{}' ignored", type);
                 break;
@@ -213,6 +238,27 @@ public class WebClient {
 
     public void onRoomMessage(String message) {
         this.plugin.broadcastMessage(message);
+    }
+
+    public void onPlayerKick(UUID uuid, String reason, String source) {
+        if (config.relayMatrixKicks) {
+            if (reason == null)
+                reason = "Kicked from server.";
+            this.plugin.kickPlayer(uuid, reason, source);
+        }
+    }
+
+    public void onPlayerBan(UUID uuid, String reason, String source) {
+        if (config.relayMatrixBans) {
+            if (reason == null)
+                reason = "Banned.";
+            this.plugin.banPlayer(uuid, reason, source);
+        }
+    }
+
+    public void onPlayerUnban(UUID uuid, String source) {
+        if (config.relayMatrixBans)
+            this.plugin.unbanPlayer(uuid, source);
     }
 
     /**
@@ -293,5 +339,22 @@ public class WebClient {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * Read a UUID from a string that has had the dashes removed.
+     *
+     * Read a UUID from the appservice, which will have originated from
+     * PoloPlayer, which removes the dashes. We have to add them back in before
+     * converting to a UUID object.
+     *
+     * @param uuid UUID string without dashes.
+     * @return UUID.
+     */
+    private UUID uuidFromString(String uuid) {
+        uuid = uuid.replaceFirst(
+                "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)",
+                "$1-$2-$3-$4-$5");
+        return java.util.UUID.fromString(uuid);
     }
 }
