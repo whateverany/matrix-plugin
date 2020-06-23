@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.UUID;
 
 
 /**
@@ -28,6 +29,8 @@ public class WebClient {
     private final int port;
     private final String token;
     private final boolean relay_mc_membership;
+    private final boolean relay_mx_kicks;
+    private final boolean relay_mx_bans;
 
     private final Logger logger = LoggerFactory.getLogger(WebClient.class);
     private final PoloPlugin plugin;
@@ -37,6 +40,8 @@ public class WebClient {
         this.port = config.port;
         this.token = config.token;
         this.relay_mc_membership = config.relay_mc_membership;
+        this.relay_mx_kicks = config.relay_mx_kicks;
+        this.relay_mx_bans = config.relay_mx_bans;
         this.plugin = plugin;
     }
 
@@ -159,6 +164,7 @@ public class WebClient {
             JSONObject sender = event.getJSONObject("sender");
             String senderDisplayName = sender.getString("displayName");
             String type = event.getString("type");
+            String reason = null;
             switch (type) {
                 case "dev.dhdf.mx.message.text":
                 case "dev.dhdf.mx.message.emote":
@@ -178,6 +184,33 @@ public class WebClient {
                     onRoomMessage(body);
                     break;
 
+                case "dev.dhdf.mx.player.kick":
+                case "dev.dhdf.mx.player.ban":
+                    // reason is optional
+                    if (event.has("reason"))
+                        reason = event.getString("reason");
+                    // Fall-through
+                case "dev.dhdf.mx.player.unban":
+                    JSONObject player = event.getJSONObject("player");
+                    String player_uuid_raw = player.getString("uuid");
+                    // Re-insert the dashes into the UUID (see PoloPlayer constructor)
+                    String player_uuid_str = player_uuid_raw.replaceFirst(
+                            "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)",
+                            "$1-$2-$3-$4-$5");
+                    UUID player_uuid = java.util.UUID.fromString(player_uuid_str);
+                    switch (type) {
+                        case "dev.dhdf.mx.player.kick":
+                            onPlayerKick(player_uuid, reason, senderDisplayName);
+                            break;
+                        case "dev.dhdf.mx.player.ban":
+                            onPlayerBan(player_uuid, reason, senderDisplayName);
+                            break;
+                        case "dev.dhdf.mx.player.unban":
+                            onPlayerUnban(player_uuid, senderDisplayName);
+                            break;
+                    }
+                    break;
+
                 default:
                     logger.warn("Unknown matrix event type '"+type+"' ignored");
                     break;
@@ -189,6 +222,27 @@ public class WebClient {
 
     public void onRoomMessage(String message) {
         this.plugin.broadcastMessage(message);
+    }
+
+    public void onPlayerKick(UUID uuid, String reason, String source) {
+        if (relay_mx_kicks) {
+            if (reason == null)
+                reason = "Kicked from server.";
+            this.plugin.kickPlayer(uuid, reason, source);
+        }
+    }
+
+    public void onPlayerBan(UUID uuid, String reason, String source) {
+        if (relay_mx_bans) {
+            if (reason == null)
+                reason = "Banned.";
+            this.plugin.banPlayer(uuid, reason, source);
+        }
+    }
+
+    public void onPlayerUnban(UUID uuid, String source) {
+        if (relay_mx_bans)
+            this.plugin.unbanPlayer(uuid, source);
     }
 
     /**

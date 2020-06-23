@@ -4,12 +4,16 @@ import dev.dhdf.polo.PoloPlugin;
 import dev.dhdf.polo.util.Sync;
 import dev.dhdf.polo.webclient.Config;
 import dev.dhdf.polo.webclient.WebClient;
+import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.BanList;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
+import java.util.UUID;
 
 
 /**
@@ -35,7 +39,9 @@ public class Main extends JavaPlugin implements PoloPlugin {
                 pluginConfig.getString("address"),
                 pluginConfig.getInt("port"),
                 pluginConfig.getString("token"),
-                pluginConfig.getBoolean("relay-mc-membership")
+                pluginConfig.getBoolean("relay-mc-membership"),
+                pluginConfig.getBoolean("relay-mx-kicks"),
+                pluginConfig.getBoolean("relay-mx-bans")
         );
 
         // Start up the web client
@@ -93,6 +99,66 @@ public class Main extends JavaPlugin implements PoloPlugin {
     @Override
     public void broadcastMessage(String message) {
         this.getServer().broadcastMessage(message);
+    }
+
+    @Override
+    public void kickPlayer(UUID uuid, String reason, String source) {
+        Player player = this.getServer().getPlayer(uuid);
+        if (player == null) {
+            Logger logger = getLogger();
+            logger.warning("No player to kick with UUID " + uuid.toString());
+            return;
+        }
+        getServer().getScheduler().runTask(this, new Runnable() {
+            public void run() {
+                player.kickPlayer(reason);
+                getServer().broadcast(source + " kicked " + player.getName() + " for " + reason, "matrix.kick.notify");
+            }
+        });
+    }
+
+    @Override
+    public void banPlayer(UUID uuid, String reason, String source) {
+        Logger logger = getLogger();
+        OfflinePlayer offlinePlayer = getServer().getOfflinePlayer(uuid);
+        if (offlinePlayer == null) {
+            logger.warning("No player to ban with UUID " + uuid.toString());
+            return;
+        }
+        BanList banlist = getServer().getBanList(BanList.Type.NAME);
+        if (banlist == null) {
+            logger.warning("No banlist found");
+            return;
+        }
+        banlist.addBan(offlinePlayer.getName(), reason, null, source);
+        getServer().broadcast(source + " banned " + offlinePlayer.getName() + " for " + reason, "matrix.ban.notify");
+
+        Player player = getServer().getPlayer(uuid);
+        if (player != null) {
+            // If online, kick now
+            getServer().getScheduler().runTask(this, new Runnable() {
+                public void run() {
+                    player.kickPlayer("You have been banned: " + reason);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void unbanPlayer(UUID uuid, String source) {
+        Logger logger = getLogger();
+        OfflinePlayer offlinePlayer = getServer().getOfflinePlayer(uuid);
+        if (offlinePlayer == null) {
+            logger.warning("No player to unban with UUID " + uuid.toString());
+            return;
+        }
+        BanList banlist = getServer().getBanList(BanList.Type.NAME);
+        if (banlist == null) {
+            logger.warning("No banlist found");
+            return;
+        }
+        banlist.pardon(offlinePlayer.getName());
+        getServer().broadcast(source + " unbanned " + offlinePlayer.getName(), "matrix.unban.notify");
     }
 
     @Override

@@ -3,3 +3,13 @@ version: '1.0.0'
 author: 'Dylan Hackworth'
 main: 'dev.dhdf.polo.bukkit.Main'
 api-version: '1.15'
+permissions:
+  matrix.kick.notify:
+    description: Notifications of kicks from Matrix.
+    default: op
+  matrix.ban.notify:
+    description: Notifications of bans from Matrix.
+    default: op
+  matrix.unban.notify:
+    description: Notifications of unbans from Matrix.
+    default: op
