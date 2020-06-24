@@ -20,7 +20,7 @@ public class MCListener implements Listener {
         this.client = client;
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onPlayerChat(AsyncPlayerChatEvent ev) {
         String body = ev.getMessage();
         Player player = ev.getPlayer();
