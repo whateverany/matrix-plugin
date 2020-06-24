@@ -153,7 +153,7 @@ public class WebClient {
                     return null;
                 }
             } else {
-                logger.error("An invalid endpoint was called for.");
+                logger.error("An invalid endpoint {} was called for.", endpoint);
                 return null;
             }
         } catch (java.net.ConnectException e) {
