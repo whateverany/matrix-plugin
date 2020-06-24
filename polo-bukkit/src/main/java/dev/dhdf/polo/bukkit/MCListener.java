@@ -25,6 +25,7 @@ public class MCListener implements Listener {
         String body = ev.getMessage();
         Player player = ev.getPlayer();
 
-        this.client.postChat(new PoloPlayer(player.getName(), player.getUniqueId()), body);
+        if (!ev.isCancelled())
+            this.client.postChat(new PoloPlayer(player.getName(), player.getUniqueId()), body);
     }
 }
