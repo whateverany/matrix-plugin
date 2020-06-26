@@ -24,17 +24,12 @@ import java.net.URL;
  * events that occurred (which is only chat messages at the moment)
  */
 public class WebClient {
-    private final String address;
-    private final int port;
-    private final String token;
-
     private final Logger logger = LoggerFactory.getLogger(WebClient.class);
+    private final Config config;
     private final PoloPlugin plugin;
 
     public WebClient(PoloPlugin plugin, Config config) {
-        this.address = config.address;
-        this.port = config.port;
-        this.token = config.token;
+        this.config = config;
         this.plugin = plugin;
     }
 
@@ -110,12 +105,12 @@ public class WebClient {
     public JSONObject doRequest(String method, String endpoint, String body, Boolean expectJSON) {
         try {
             URL url = new URL(
-                    "http://" + address + ":" + port + endpoint
+                    "http://" + config.address + ":" + config.port + endpoint
             );
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod(method);
-            connection.setRequestProperty("Authorization", "Bearer " + this.token);
+            connection.setRequestProperty("Authorization", "Bearer " + config.token);
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("User-Agent", "Marco Spigot Plugin");
 
