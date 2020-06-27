@@ -1,8 +1,8 @@
 package dev.dhdf.polo.types;
 
-import org.json.JSONStringer;
+import org.json.JSONObject;
 
-public class MCMessage {
+public class MCMessage extends MCEvent {
     public final PoloPlayer player;
     public final String message;
 
@@ -11,19 +11,10 @@ public class MCMessage {
         this.message = message;
     }
 
-    public String toString() {
-        return new JSONStringer()
-                .object()
-                .key("player")
-                .object()
-                .key("name")
-                .value(this.player.name)
-                .key("uuid")
-                .value(this.player.uuid)
-                .endObject()
-                .key("message")
-                .value(this.message)
-                .endObject()
-                .toString();
+    @Override
+    public JSONObject toJSON() {
+        return new JSONObject()
+            .put("player", player.toJSON())
+            .put("message", this.message);
     }
 }
