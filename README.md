@@ -1,5 +1,5 @@
 # Matrix Plugin
-Built for: [Matrix Minecraft Appservice (0.9.7)](https://github.com/dhghf/matrix-appservice-minecraft)
+Built for: [Matrix Minecraft Appservice (0.9.7)](https://github.com/dylhack/matrix-appservice-minecraft)
 
 ## Setup
  1. Run `gradle build`
