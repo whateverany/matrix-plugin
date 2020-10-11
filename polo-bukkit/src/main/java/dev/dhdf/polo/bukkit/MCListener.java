@@ -2,6 +2,7 @@ package dev.dhdf.polo.bukkit;
 
 import dev.dhdf.polo.types.PoloPlayer;
 import dev.dhdf.polo.webclient.WebClient;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
