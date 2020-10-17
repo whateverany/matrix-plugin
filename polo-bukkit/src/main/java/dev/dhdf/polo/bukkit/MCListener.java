@@ -12,44 +12,44 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 
 /**
- * This class listens to all the events happening on Minecraft. Currently
- * it only listens to player chat events.
+ * This class listens to all the standard bukkit events happening on Minecraft.
  */
-public class MCListener implements Listener {
-
-    private final WebClient client;
-
+public class MCListener extends PoloListener implements Listener {
     public MCListener(WebClient client) {
-        this.client = client;
+        super(client);
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent ev) {
         Player player = ev.getPlayer();
+        PoloPlayer poloPlayer = newPoloPlayer(player);
 
-        this.client.postJoin(new PoloPlayer(player.getName(), player.getUniqueId()));
+        this.client.postJoin(poloPlayer);
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent ev) {
         Player player = ev.getPlayer();
+        PoloPlayer poloPlayer = newPoloPlayer(player);
 
-        this.client.postQuit(new PoloPlayer(player.getName(), player.getUniqueId()));
+        this.client.postQuit(poloPlayer);
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerKick(PlayerKickEvent ev) {
         Player player = ev.getPlayer();
         String kickReason = ev.getReason();
+        PoloPlayer poloPlayer = newPoloPlayer(player);
 
-        this.client.postKick(new PoloPlayer(player.getName(), player.getUniqueId()), kickReason);
+        this.client.postKick(poloPlayer, kickReason);
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerChat(AsyncPlayerChatEvent ev) {
         String body = ev.getMessage();
         Player player = ev.getPlayer();
+        PoloPlayer poloPlayer = newPoloPlayer(player);
 
-        this.client.postChat(new PoloPlayer(player.getName(), player.getUniqueId()), body);
+        this.client.postChat(poloPlayer, body);
     }
 }
