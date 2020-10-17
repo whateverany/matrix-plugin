@@ -54,7 +54,7 @@ public class Main extends JavaPlugin implements PoloPlugin {
         Logger.getLogger(WebClient.class.getName()).setParent(getLogger());
 
         // Start up the Minecraft event listener
-        MCListener mcListener = new MCListener(webClient);
+        MCListener mcListener = new MCListener(this, webClient);
 
         getServer().getPluginManager().registerEvents(mcListener, this);
 

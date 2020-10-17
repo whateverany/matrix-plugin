@@ -10,22 +10,30 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.plugin.Plugin;
 
 
 /**
  * This class listens to all the standard bukkit events happening on Minecraft.
  */
 public class MCListener extends PoloListener implements Listener {
-    public MCListener(WebClient client) {
-        super(client);
+    public MCListener(Plugin plugin, WebClient client) {
+        super(plugin, client);
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent ev) {
-        Player player = ev.getPlayer();
-        PoloPlayer poloPlayer = newPoloPlayer(player);
+        // Don't post the join immediately, allow other plugins to update the player
+        // state (e.g. displayName or texture) first
+        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            Player player = ev.getPlayer();
+            // Avoid race with disconnect
+            if (!player.isOnline())
+                return;
 
-        this.client.postJoin(poloPlayer);
+            PoloPlayer poloPlayer = newPoloPlayer(player);
+            this.client.postJoin(poloPlayer);
+        }, 2);
     }
 
     @EventHandler
