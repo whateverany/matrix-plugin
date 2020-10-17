@@ -75,7 +75,7 @@ public class Main implements PoloPlugin {
             return;
         }
 
-        PoloPlayer player = new PoloPlayer(source.getName(), source.getUniqueId(), null);
+        PoloPlayer player = new PoloPlayer(source.getName(), source.getUniqueId(), null, null);
         String message = evt.getFormatter().getBody().toText().toPlain();
         this.client.postChat(player, message);
     }

@@ -21,6 +21,9 @@ public class PoloListener {
     }
 
     protected PoloPlayer newPoloPlayer(Player player) {
-        return new PoloPlayer(player.getName(), player.getUniqueId(), helper.getTexture(player));
+        // Strip out Minecraft formatting codes from the display name
+        String displayName = player.getDisplayName().replaceAll("\u00a7.", "");
+        return new PoloPlayer(player.getName(), player.getUniqueId(),
+                              displayName, helper.getTexture(player));
     }
 }
