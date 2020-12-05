@@ -4,22 +4,33 @@ import dev.dhdf.polo.PoloPlugin;
 import dev.dhdf.polo.util.Sync;
 import dev.dhdf.polo.webclient.Config;
 import dev.dhdf.polo.webclient.WebClient;
+import dev.dhdf.polo.types.IntermediateJSON;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.BanList;
+//import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.text.Component;
 
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 import java.util.UUID;
-
+import java.util.Collection;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * This starts the plugin
  */
 public class Main extends JavaPlugin implements PoloPlugin {
+    private BukkitAudiences audiences;
+
     @Override
     public void onEnable() {
         // Save the default config if it isn't already there
@@ -43,6 +54,9 @@ public class Main extends JavaPlugin implements PoloPlugin {
                 pluginConfig.getBoolean("relay-matrix-kicks"),
                 pluginConfig.getBoolean("relay-matrix-bans")
         );
+
+        // Grab the adventure-platform-bukkit audiences object
+        this.audiences = BukkitAudiences.create(this);
 
         // Start up the web client
         WebClient webClient = new WebClient(
@@ -98,6 +112,45 @@ public class Main extends JavaPlugin implements PoloPlugin {
 
     @Override
     public void broadcastMessage(String message, Object json) {
+        if (json != null) {
+            IntermediateJSON intermediate = new IntermediateJSON(json);
+
+            // make audiences of mentioned and not mentioned players
+            Audience notMentionedAudience;
+            Audience mentionedAudience;
+
+            if (intermediate.getRoomMention()) {
+                // the whole room was mentioned
+                final Collection<Player> players = (Collection<Player>)Bukkit.getOnlinePlayers();
+                mentionedAudience = audiences.filter(s -> /*s instanceof ConsoleCommandSender ||*/ s instanceof Player);
+                notMentionedAudience = null;
+            } else {
+                final Set<UUID> mentions = intermediate.getMentions();
+                mentionedAudience = audiences.filter(s -> s instanceof Player && mentions.contains(((Player)s).getUniqueId()));
+                notMentionedAudience = audiences.filter(s -> /*s instanceof ConsoleCommandSender ||*/ s instanceof Player && !mentions.contains(((Player)s).getUniqueId()));
+            }
+
+            // send a special highlighted variant to mentioned players
+            if (mentionedAudience != null) {
+                Component mcJsonHighlight = intermediate.getComponentHighlight();
+                mentionedAudience.sendMessage(mcJsonHighlight);
+            }
+            // and send the normal message to not-mentioned players
+            if (notMentionedAudience != null) {
+                Component mcJson = intermediate.getComponent();
+                notMentionedAudience.sendMessage(mcJson);
+            }
+
+            // FIXME RGB colours to console via Bukkit are corrupted
+            // https://github.com/KyoriPowered/adventure-platform/issues/38
+            // Workaround using getLegacy*() for now
+            Logger logger = getLogger();
+            if (intermediate.getRoomMention())
+                logger.info(intermediate.getLegacyHighlight());
+            else
+                logger.info(intermediate.getLegacy());
+            return;
+        }
         this.getServer().broadcastMessage(message);
     }
 
