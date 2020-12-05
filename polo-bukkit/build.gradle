@@ -11,10 +11,17 @@ repositories {
             includeGroup 'org.bukkit'
         }
     }
+    // for development builds of net.kyori:adventure-platform-bukkit
+    maven {
+        name = 'sonatype-oss'
+        url = 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
 }
 
 dependencies {
     implementation project(':polo-common')
+
+    implementation "net.kyori:adventure-platform-bukkit:${adventureBukkitVersion}"
 
     runtimeOnly "org.slf4j:slf4j-jdk14:${slf4jVersion}"
     compileOnly 'org.bukkit:bukkit:1.15.2-R0.1-SNAPSHOT'
