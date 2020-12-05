@@ -4,6 +4,7 @@ allprojects {
 
     ext {
         slf4jVersion = '1.7.30'
+        adventureVersion = '4.3.0'
     }
 }
 
