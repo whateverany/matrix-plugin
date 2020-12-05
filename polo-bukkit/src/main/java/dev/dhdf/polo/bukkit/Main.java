@@ -97,7 +97,7 @@ public class Main extends JavaPlugin implements PoloPlugin {
     }
 
     @Override
-    public void broadcastMessage(String message) {
+    public void broadcastMessage(String message, Object json) {
         this.getServer().broadcastMessage(message);
     }
 

@@ -7,7 +7,7 @@ public interface PoloPlugin {
      * Broadcast a Matrix message to the server.
      * @param message The message to broadcast
      */
-    public void broadcastMessage(String message);
+    public void broadcastMessage(String message, Object json);
 
     /**
      * Kick a player from the server.

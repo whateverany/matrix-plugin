@@ -150,7 +150,7 @@ public class WebClient {
         // Send all the new messages to the minecraft chat
         for (int i = 0; i < messages.length(); ++i) {
             String message = messages.getString(i);
-            onRoomMessage(message);
+            onRoomMessage(message, null);
         }
 
         return true;
@@ -193,18 +193,62 @@ public class WebClient {
             case "message.emote":
             case "message.announce":
                 String body = event.getString("body");
+                Object json = event.opt("bodyJson");
+                if (json == null)
+                    json = body;
+
+                JSONObject inlineBlock = new JSONObject();
+                inlineBlock.put("type", "block");
+                inlineBlock.put("block", "inline");
+                inlineBlock.put("content", json);
+                json = inlineBlock;
+
                 switch (type) {
-                    case "message.text":
+                    case "message.text": {
                         body = "<" + senderDisplayName + "> " + body;
+
+                        JSONArray newJson = new JSONArray();
+                        newJson.put("<");
+
+                        JSONObject senderMention = new JSONObject();
+                        senderMention.put("type", "mention");
+                        senderMention.put("user", sender);
+                        senderMention.put("content", senderDisplayName);
+                        newJson.put(senderMention);
+
+                        newJson.put("> ");
+                        newJson.put(json);
+                        json = newJson;
                         break;
-                    case "message.emote":
+                    }
+                    case "message.emote": {
                         body = " * <" + senderDisplayName + "> " + body;
+
+                        JSONArray newJson = new JSONArray();
+                        newJson.put(" * <");
+
+                        JSONObject senderMention = new JSONObject();
+                        senderMention.put("type", "mention");
+                        senderMention.put("user", sender);
+                        senderMention.put("content", senderDisplayName);
+                        newJson.put(senderMention);
+
+                        newJson.put("> ");
+                        newJson.put(json);
+                        json = newJson;
                         break;
-                    case "message.announce":
+                    }
+                    case "message.announce": {
                         body = "[Server]" + body;
+
+                        JSONArray newJson = new JSONArray();
+                        newJson.put("[Server] ");
+                        newJson.put(json);
+                        json = newJson;
                         break;
+                    }
                 }
-                onRoomMessage(body);
+                onRoomMessage(body, json);
                 break;
 
             case "player.kick":
@@ -236,8 +280,8 @@ public class WebClient {
         }
     }
 
-    public void onRoomMessage(String message) {
-        this.plugin.broadcastMessage(message);
+    public void onRoomMessage(String message, Object json) {
+        this.plugin.broadcastMessage(message, json);
     }
 
     public void onPlayerKick(UUID uuid, String reason, String source) {
