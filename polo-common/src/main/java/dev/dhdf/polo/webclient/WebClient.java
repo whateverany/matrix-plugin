@@ -5,6 +5,7 @@ import dev.dhdf.polo.types.MCMessage;
 import dev.dhdf.polo.types.MCJoin;
 import dev.dhdf.polo.types.MCQuit;
 import dev.dhdf.polo.types.MCKick;
+import dev.dhdf.polo.types.MCDeath;
 import dev.dhdf.polo.types.PoloPlayer;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -105,6 +106,31 @@ public class WebClient {
                 this.doRequest(
                         "POST",
                         "/player/kick",
+                        body,
+                        false
+                )
+        );
+    }
+
+    /**
+     * Send player death event to Marco
+     *
+     * @param player Player object representing a Minecraft player who has died
+     *                      kicked, it must be parsed before sent to Marco
+     * @param message The death message for the player who died
+     */
+    public void postDeath(PoloPlayer player, String message) {
+        if (!config.relayMinecraftDeaths)
+            return;
+
+        MCDeath death = new MCDeath(player, message);
+        String body = death.toString();
+
+        // Run communication outside the server thread
+        plugin.executeAsync(() ->
+                this.doRequest(
+                        "POST",
+                        "/player/death",
                         body,
                         false
                 )

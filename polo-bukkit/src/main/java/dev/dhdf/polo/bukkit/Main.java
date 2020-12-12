@@ -41,6 +41,7 @@ public class Main extends JavaPlugin implements PoloPlugin {
                 pluginConfig.getInt("port"),
                 pluginConfig.getString("token"),
                 pluginConfig.getBoolean("relay-minecraft-membership"),
+                pluginConfig.getBoolean("relay-minecraft-deaths"),
                 pluginConfig.getBoolean("relay-matrix-kicks"),
                 pluginConfig.getBoolean("relay-matrix-bans")
         );

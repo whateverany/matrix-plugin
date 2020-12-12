@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
 
 
@@ -51,6 +52,15 @@ public class MCListener extends PoloListener implements Listener {
         PoloPlayer poloPlayer = newPoloPlayer(player);
 
         this.client.postKick(poloPlayer, kickReason);
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent ev) {
+        String message = ev.getDeathMessage();
+        Player player = ev.getEntity();
+        PoloPlayer poloPlayer = newPoloPlayer(player);
+
+        this.client.postDeath(poloPlayer, message);
     }
 
     @EventHandler(ignoreCancelled = true)

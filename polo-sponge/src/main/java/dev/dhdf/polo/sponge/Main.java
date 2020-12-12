@@ -147,7 +147,7 @@ public class Main implements PoloPlugin {
         }
 
         public dev.dhdf.polo.webclient.Config getConfig() {
-            return new dev.dhdf.polo.webclient.Config(address, port, token, false, false, false);
+            return new dev.dhdf.polo.webclient.Config(address, port, token, false, false, false, false);
         }
     }
 }

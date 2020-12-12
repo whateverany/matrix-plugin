@@ -13,6 +13,11 @@ token: ""
 # chat messages from players, and won't leave by themselves.
 relay-minecraft-membership: true
 
+# Whether to relay Minecraft player deaths to Matrix.
+# If this is set to true, the _mc_bot user will send notifications when a
+# player dies in the Minecraft server.
+relay-minecraft-deaths: true
+
 # Whether to relay Matrix kicks to Minecraft.
 # If this is set to true, the plugin will respond to fake Matrix users being
 # kicked by kicking the corresponding player from the minecraft server.
