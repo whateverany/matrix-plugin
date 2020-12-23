@@ -27,6 +27,7 @@ import org.spongepowered.api.text.channel.MessageChannel;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import java.util.UUID;
 
 
 @Plugin(id = "polo",
@@ -105,6 +106,18 @@ public class Main implements PoloPlugin {
     }
 
     @Override
+    public void kickPlayer(UUID uuid, String reason, String source) {
+    }
+
+    @Override
+    public void banPlayer(UUID uuid, String reason, String source) {
+    }
+
+    @Override
+    public void unbanPlayer(UUID uuid, String source) {
+    }
+
+    @Override
     public void executeAsync(Runnable task) {
         Task.builder()
                 .async()
@@ -134,7 +147,7 @@ public class Main implements PoloPlugin {
         }
 
         public dev.dhdf.polo.webclient.Config getConfig() {
-            return new dev.dhdf.polo.webclient.Config(address, port, token);
+            return new dev.dhdf.polo.webclient.Config(address, port, token, false, false, false);
         }
     }
 }
