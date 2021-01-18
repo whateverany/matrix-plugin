@@ -75,7 +75,7 @@ public class Main implements PoloPlugin {
             return;
         }
 
-        PoloPlayer player = new PoloPlayer(source.getName(), source.getUniqueId());
+        PoloPlayer player = new PoloPlayer(source.getName(), source.getUniqueId(), null, null);
         String message = evt.getFormatter().getBody().toText().toPlain();
         this.client.postChat(player, message);
     }
@@ -147,7 +147,7 @@ public class Main implements PoloPlugin {
         }
 
         public dev.dhdf.polo.webclient.Config getConfig() {
-            return new dev.dhdf.polo.webclient.Config(address, port, token, false, false, false);
+            return new dev.dhdf.polo.webclient.Config(address, port, token, false, false, false, false);
         }
     }
 }
