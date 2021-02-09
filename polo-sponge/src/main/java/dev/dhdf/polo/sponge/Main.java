@@ -101,7 +101,7 @@ public class Main implements PoloPlugin {
     }
 
     @Override
-    public void broadcastMessage(String message) {
+    public void broadcastMessage(String message, Object json) {
         Sponge.getServer().getBroadcastChannel().send(Text.of(message));
     }
 
