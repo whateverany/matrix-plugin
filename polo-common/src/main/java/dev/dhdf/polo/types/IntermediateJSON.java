@@ -381,7 +381,7 @@ public class IntermediateJSON {
     private static void linkToComponent(JSONObject obj,
                                         TextComponent.Builder newObj) {
         String href = obj.optString("href", "");
-        if (href != "") {
+        if (!href.isEmpty()) {
             newObj.hoverEvent(HoverEvent.showText(Component.text(href)));
             try {
                 newObj.clickEvent(ClickEvent.openUrl(new URL(href)));
