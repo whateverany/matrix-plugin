@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
@@ -24,9 +24,7 @@ jobs:
     - uses: gradle/gradle-build-action@v2
       with:
         gradle-version: wrapper
-
-    - name: Gradle Build
-      run: gradle build && find
+        arguments: build
     
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
