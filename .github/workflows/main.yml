@@ -20,5 +20,4 @@ jobs:
         arguments: build
     - uses: actions/upload-artifact@v2
       with:
-        name: Polo
         path: ./polo-bukkit/build/libs/polo-bukkit-*.jar
