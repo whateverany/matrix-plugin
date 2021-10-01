@@ -33,4 +33,4 @@ dependencies {
     }
 }
 
-assemble.dependsOn shadowJar
+//assemble.dependsOn shadowJar
