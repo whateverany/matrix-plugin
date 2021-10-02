@@ -1,29 +1,29 @@
+plugins {
+    id 'maven-publish'
+}
 allprojects {
     group 'dev.dhdf'
     version = System.getenv("GITHUB_REF")
 
     ext {
-        slf4jVersion = '1.7.30'
-        adventureVersion = '4.3.0'
-        adventureBukkitVersion = '4.0.0-SNAPSHOT'
+      slf4jVersion = '1.7.30'
+      adventureVersion = '4.3.0'
+      adventureBukkitVersion = '4.0.0-SNAPSHOT'
     }
-    
-    plugins {
-      id 'maven-publish'
-    }
+
 
     publishing {
 
-    repositories {
-      maven {
-        url = "https://maven.pkg.github.com/octocat/hello-world"
-        credentials {
-          username = System.getenv("GITHUB_ACTOR")
-          password = System.getenv("GITHUB_TOKEN")
+      repositories {
+        maven {
+          url = "https://maven.pkg.github.com/octocat/hello-world"
+          credentials {
+            username = System.getenv("GITHUB_ACTOR")
+            password = System.getenv("GITHUB_TOKEN")
+          }
         }
       }
-    }
-  }
+   }
 }
 
 subprojects {
