@@ -17,7 +17,7 @@ jobs:
         java-version: 1.8
     - uses: gradle/gradle-build-action@v2
       with:
-        arguments: build
+        arguments: build publish
     - uses: actions/upload-artifact@v2
       with:
         path: ./polo-bukkit/build/libs/polo-bukkit-*.jar
